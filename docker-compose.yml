@@ -1,0 +1,7 @@
+yaevent-dev-mongodb:
+  container_name: yaevent-dev-mongodb
+  image: mongo:3.0.7
+  # volumes:
+  #   - ~/volumes/jhipster/yaevent/dev-mongodb/:/data/db/
+  ports:
+    - "27017:27017"

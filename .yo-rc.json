@@ -1,0 +1,24 @@
+{
+  "generator-jhipster": {
+    "baseName": "yaevent",
+    "packageName": "com.ya.yaevent",
+    "packageFolder": "com/ya/yaevent",
+    "authenticationType": "xauth",
+    "hibernateCache": "no",
+    "clusteredHttpSession": "no",
+    "websocket": "no",
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": "no",
+    "useSass": false,
+    "buildTool": "gradle",
+    "frontendBuilder": "grunt",
+    "enableTranslation": false,
+    "enableSocialSignIn": false,
+    "rememberMeKey": "b429f4c4906c2c3f55fa2b6afc1fa75b61ab8a80",
+    "testFrameworks": [
+      "gatling"
+    ]
+  }
+}
