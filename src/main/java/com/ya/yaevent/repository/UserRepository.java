@@ -1,12 +1,12 @@
 package com.ya.yaevent.repository;
 
-import com.ya.yaevent.domain.User;
-
 import java.time.ZonedDateTime;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.ya.yaevent.domain.User;
 
 /**
  * Spring Data MongoDB repository for the User entity.
@@ -24,6 +24,12 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findOneByLogin(String login);
 
     Optional<User> findOneById(String userId);
+    
+    List<User> findByUsernameIn(List<String> usernames);
+	
+	List<User> findByEmail(String email);
+
+	List<User> findByUsername(String username);
 
     @Override
     void delete(User t);

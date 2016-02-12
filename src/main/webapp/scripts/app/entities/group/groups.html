@@ -1,0 +1,64 @@
+<div>
+    <h2>Groups</h2>
+    <jh-alert></jh-alert>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <button class="btn btn-primary" ui-sref="group.new">
+                    <span class="glyphicon glyphicon-flash"></span> <span>Create a new Group</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th><span>ID</span></th>
+                    <th><span>CreationDate</span></th>
+                    <th><span>ModificationDate</span></th>
+                    <th><span>Version</span></th>
+                    <th><span>Status</span></th>
+                    <th><span>EventSize</span></th>
+                    <th><span>Type</span></th>
+                    <th><span>Name</span></th>
+                    <th><span>Description</span></th>
+                    <th><span>Location</span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="group in groups track by group.id">
+                    <td><a ui-sref="group.detail({id:group.id})">{{group.id}}</a></td>
+                    <td>{{group.creationDate | date:'medium'}}</td>
+                    <td>{{group.modificationDate | date:'medium'}}</td>
+                    <td>{{group.version}}</td>
+                    <td>{{group.status}}</td>
+                    <td>{{group.eventSize}}</td>
+                    <td>{{group.type}}</td>
+                    <td>{{group.name}}</td>
+                    <td>{{group.description}}</td>
+                    <td>{{group.location}}</td>
+                    <td>
+                        <button type="submit"
+                                ui-sref="group.detail({id:group.id})"
+                                class="btn btn-info btn-sm">
+                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<span> View</span>
+                        </button>
+                        <button type="submit"
+                                ui-sref="group.edit({id:group.id})"
+                                class="btn btn-primary btn-sm">
+                            <span class="glyphicon glyphicon-pencil"></span>&nbsp;<span> Edit</span>
+                        </button>
+                        <button type="submit"
+                                ui-sref="group.delete({id:group.id})"
+                                class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;<span> Delete</span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

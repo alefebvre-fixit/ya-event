@@ -1,22 +1,22 @@
 package com.ya.yaevent.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.time.ZonedDateTime;
+
+import org.hibernate.validator.constraints.Email;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ya.yaevent.domain.user.Profile;
+import com.ya.yaevent.domain.user.UserIdentifier;
 
 /**
  * A user.
@@ -24,181 +24,226 @@ import java.time.ZonedDateTime;
 @Document(collection = "jhi_user")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    @NotNull
-    @Pattern(regexp = "^[a-z0-9]*$|(anonymousUser)")
-    @Size(min = 1, max = 50)
-    private String login;
+	@NotNull
+	@Pattern(regexp = "^[a-z0-9]*$|(anonymousUser)")
+	@Size(min = 1, max = 50)
+	private String login;
 
-    @JsonIgnore
-    @NotNull
-    @Size(min = 60, max = 60) 
-    private String password;
+	@JsonIgnore
+	@NotNull
+	@Size(min = 60, max = 60)
+	private String password;
 
-    @Size(max = 50)
-    @Field("first_name")
-    private String firstName;
+	@Size(max = 50)
+	@Field("first_name")
+	private String firstName;
 
-    @Size(max = 50)
-    @Field("last_name")
-    private String lastName;
+	@Size(max = 50)
+	@Field("last_name")
+	private String lastName;
+	
+	@Size(max = 50)
+	@Field("username")
+	private String username;
 
-    @Email
-    @Size(max = 100)
-    private String email;
+	@Email
+	@Size(max = 100)
+	private String email;
 
-    private boolean activated = false;
+	private boolean activated = false;
 
-    @Size(min = 2, max = 5)
-    @Field("lang_key")
-    private String langKey;
+	@Size(min = 2, max = 5)
+	@Field("lang_key")
+	private String langKey;
 
-    @Size(max = 20)
-    @Field("activation_key")
-    @JsonIgnore
-    private String activationKey;
+	@Size(max = 20)
+	@Field("activation_key")
+	@JsonIgnore
+	private String activationKey;
 
-    @Size(max = 20)
-    @Field("reset_key")
-    private String resetKey;
+	@Size(max = 20)
+	@Field("reset_key")
+	private String resetKey;
 
-    @Field("reset_date")
-    private ZonedDateTime resetDate = null;
+	@Field("reset_date")
+	private ZonedDateTime resetDate = null;
 
-    @JsonIgnore
-    private Set<Authority> authorities = new HashSet<>();
+	@JsonIgnore
+	private Set<Authority> authorities = new HashSet<>();
+	
+	private Profile profile = new Profile();
 
-    public String getId() {
-        return id;
-    }
+	public Profile getProfile() {
+		return profile;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setProfile(Profile profile) {
+		this.profile = profile;
+	}
 
-    public String getLogin() {
-        return login;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getLogin() {
+		return login;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setLogin(String login) {
+		this.login = login;
+	}
 
-    public String getFirstName() {
-        return firstName;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public String getLastName() {
-        return lastName;
-    }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getLastName() {
+		return lastName;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public boolean getActivated() {
-        return activated;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public String getActivationKey() {
-        return activationKey;
-    }
+	public boolean getActivated() {
+		return activated;
+	}
 
-    public void setActivationKey(String activationKey) {
-        this.activationKey = activationKey;
-    }
+	public void setActivated(boolean activated) {
+		this.activated = activated;
+	}
 
-    public String getResetKey() {
-        return resetKey;
-    }
+	public String getActivationKey() {
+		return activationKey;
+	}
 
-    public void setResetKey(String resetKey) {
-        this.resetKey = resetKey;
-    }
+	public void setActivationKey(String activationKey) {
+		this.activationKey = activationKey;
+	}
 
-    public ZonedDateTime getResetDate() {
-       return resetDate;
-    }
+	public String getResetKey() {
+		return resetKey;
+	}
 
-    public void setResetDate(ZonedDateTime resetDate) {
-       this.resetDate = resetDate;
-    }
+	public void setResetKey(String resetKey) {
+		this.resetKey = resetKey;
+	}
 
-    public String getLangKey() {
-        return langKey;
-    }
+	public ZonedDateTime getResetDate() {
+		return resetDate;
+	}
 
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
+	public void setResetDate(ZonedDateTime resetDate) {
+		this.resetDate = resetDate;
+	}
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
-    }
+	public String getLangKey() {
+		return langKey;
+	}
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
-    }
+	public void setLangKey(String langKey) {
+		this.langKey = langKey;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	public Set<Authority> getAuthorities() {
+		return authorities;
+	}
 
-        User user = (User) o;
+	public void setAuthorities(Set<Authority> authorities) {
+		this.authorities = authorities;
+	}
 
-        if (!login.equals(user.login)) {
-            return false;
-        }
+	private String facebookId;
+	private String gravatarId;
 
-        return true;
-    }
+	public String getFacebookId() {
+		return facebookId;
+	}
 
-    @Override
-    public int hashCode() {
-        return login.hashCode();
-    }
+	public void setFacebookId(String facebookId) {
+		this.facebookId = facebookId;
+	}
 
-    @Override
-    public String toString() {
-        return "User{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            "}";
-    }
+	public String getGravatarId() {
+		return gravatarId;
+	}
+
+	public void setGravatarId(String gravatarId) {
+		this.gravatarId = gravatarId;
+	}
+
+	public UserIdentifier getIdentifier() {
+		UserIdentifier result = new UserIdentifier();
+
+		result.setFacebookId(facebookId);
+		result.setGravatarId(gravatarId);
+		result.setUsername(login);
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		User user = (User) o;
+
+		if (!login.equals(user.login)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@Override
+	public int hashCode() {
+		return login.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "User{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
+				+ '\'' + ", email='" + email + '\'' + ", activated='" + activated + '\'' + ", langKey='" + langKey
+				+ '\'' + ", activationKey='" + activationKey + '\'' + "}";
+	}
 }

@@ -1,0 +1,53 @@
+{
+    "relationships": [],
+    "fields": [
+        {
+            "fieldId": 1,
+            "fieldName": "creationDate",
+            "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldId": 2,
+            "fieldName": "modificationDate",
+            "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldId": 3,
+            "fieldName": "version",
+            "fieldType": "Double"
+        },
+        {
+            "fieldId": 4,
+            "fieldName": "status",
+            "fieldType": "String"
+        },
+        {
+            "fieldId": 5,
+            "fieldName": "eventSize",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldId": 6,
+            "fieldName": "type",
+            "fieldType": "String"
+        },
+        {
+            "fieldId": 7,
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldId": 8,
+            "fieldName": "description",
+            "fieldType": "String"
+        },
+        {
+            "fieldId": 9,
+            "fieldName": "location",
+            "fieldType": "String"
+        }
+    ],
+    "dto": "no",
+    "service": "serviceImpl",
+    "pagination": "no"
+}

@@ -1,23 +1,29 @@
 package com.ya.yaevent.service;
 
-import com.ya.yaevent.domain.Authority;
-import com.ya.yaevent.domain.User;
-import com.ya.yaevent.repository.AuthorityRepository;
-import com.ya.yaevent.repository.UserRepository;
-import com.ya.yaevent.security.SecurityUtils;
-import com.ya.yaevent.service.util.RandomUtil;
-import com.ya.yaevent.web.rest.dto.ManagedUserDTO;
 import java.time.ZonedDateTime;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
-import javax.inject.Inject;
-import java.util.*;
+import com.ya.yaevent.domain.Authority;
+import com.ya.yaevent.domain.User;
+import com.ya.yaevent.domain.user.UserIdentifier;
+import com.ya.yaevent.repository.AuthorityRepository;
+import com.ya.yaevent.repository.UserRepository;
+import com.ya.yaevent.security.SecurityUtils;
+import com.ya.yaevent.service.util.RandomUtil;
+import com.ya.yaevent.util.YaUtil;
+import com.ya.yaevent.web.rest.dto.ManagedUserDTO;
 
 /**
  * Service class for managing users.
@@ -25,172 +31,216 @@ import java.util.*;
 @Service
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+	private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    @Inject
-    private PasswordEncoder passwordEncoder;
+	@Inject
+	private PasswordEncoder passwordEncoder;
 
-    @Inject
-    private UserRepository userRepository;
+	@Inject
+	private UserRepository userRepository;
 
-    @Inject
-    private AuthorityRepository authorityRepository;
+	@Inject
+	private AuthorityRepository authorityRepository;
 
-    public Optional<User> activateRegistration(String key) {
-        log.debug("Activating user for activation key {}", key);
-        userRepository.findOneByActivationKey(key)
-            .map(user -> {
-                // activate given user for the registration key.
-                user.setActivated(true);
-                user.setActivationKey(null);
-                userRepository.save(user);
-                log.debug("Activated user: {}", user);
-                return user;
-            });
-        return Optional.empty();
-    }
+	public Optional<User> activateRegistration(String key) {
+		log.debug("Activating user for activation key {}", key);
+		userRepository.findOneByActivationKey(key).map(user -> {
+			// activate given user for the registration key.
+			user.setActivated(true);
+			user.setActivationKey(null);
+			userRepository.save(user);
+			log.debug("Activated user: {}", user);
+			return user;
+		});
+		return Optional.empty();
+	}
 
-    public Optional<User> completePasswordReset(String newPassword, String key) {
-       log.debug("Reset user password for reset key {}", key);
+	public Optional<User> completePasswordReset(String newPassword, String key) {
+		log.debug("Reset user password for reset key {}", key);
 
-       return userRepository.findOneByResetKey(key)
-            .filter(user -> {
-                ZonedDateTime oneDayAgo = ZonedDateTime.now().minusHours(24);
-                return user.getResetDate().isAfter(oneDayAgo);
-           })
-           .map(user -> {
-                user.setPassword(passwordEncoder.encode(newPassword));
-                user.setResetKey(null);
-                user.setResetDate(null);
-                userRepository.save(user);
-                return user;
-           });
-    }
+		return userRepository.findOneByResetKey(key).filter(user -> {
+			ZonedDateTime oneDayAgo = ZonedDateTime.now().minusHours(24);
+			return user.getResetDate().isAfter(oneDayAgo);
+		}).map(user -> {
+			user.setPassword(passwordEncoder.encode(newPassword));
+			user.setResetKey(null);
+			user.setResetDate(null);
+			userRepository.save(user);
+			return user;
+		});
+	}
 
-    public Optional<User> requestPasswordReset(String mail) {
-        return userRepository.findOneByEmail(mail)
-            .filter(User::getActivated)
-            .map(user -> {
-                user.setResetKey(RandomUtil.generateResetKey());
-                user.setResetDate(ZonedDateTime.now());
-                userRepository.save(user);
-                return user;
-            });
-    }
+	public Optional<User> requestPasswordReset(String mail) {
+		return userRepository.findOneByEmail(mail).filter(User::getActivated).map(user -> {
+			user.setResetKey(RandomUtil.generateResetKey());
+			user.setResetDate(ZonedDateTime.now());
+			userRepository.save(user);
+			return user;
+		});
+	}
 
-    public User createUserInformation(String login, String password, String firstName, String lastName, String email,
-        String langKey) {
+	public User createUserInformation(String login, String password, String firstName, String lastName, String email,
+			String langKey) {
 
-        User newUser = new User();
-        Authority authority = authorityRepository.findOne("ROLE_USER");
-        Set<Authority> authorities = new HashSet<>();
-        String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(login);
-        // new user gets initially a generated password
-        newUser.setPassword(encryptedPassword);
-        newUser.setFirstName(firstName);
-        newUser.setLastName(lastName);
-        newUser.setEmail(email);
-        newUser.setLangKey(langKey);
-        // new user is not active
-        newUser.setActivated(false);
-        // new user gets registration key
-        newUser.setActivationKey(RandomUtil.generateActivationKey());
-        authorities.add(authority);
-        newUser.setAuthorities(authorities);
-        userRepository.save(newUser);
-        log.debug("Created Information for User: {}", newUser);
-        return newUser;
-    }
+		User newUser = new User();
+		Authority authority = authorityRepository.findOne("ROLE_USER");
+		Set<Authority> authorities = new HashSet<>();
+		String encryptedPassword = passwordEncoder.encode(password);
+		newUser.setLogin(login);
+		// new user gets initially a generated password
+		newUser.setPassword(encryptedPassword);
+		newUser.setFirstName(firstName);
+		newUser.setLastName(lastName);
+		newUser.setEmail(email);
+		newUser.setLangKey(langKey);
+		// new user is not active
+		newUser.setActivated(false);
+		// new user gets registration key
+		newUser.setActivationKey(RandomUtil.generateActivationKey());
+		authorities.add(authority);
+		newUser.setAuthorities(authorities);
+		userRepository.save(newUser);
+		log.debug("Created Information for User: {}", newUser);
+		return newUser;
+	}
 
-    public User createUser(ManagedUserDTO managedUserDTO) {
-        User user = new User();
-        user.setLogin(managedUserDTO.getLogin());
-        user.setFirstName(managedUserDTO.getFirstName());
-        user.setLastName(managedUserDTO.getLastName());
-        user.setEmail(managedUserDTO.getEmail());
-        if (managedUserDTO.getLangKey() == null) {
-            user.setLangKey("en"); // default language is English
-        } else {
-            user.setLangKey(managedUserDTO.getLangKey());
-        }
-        if (managedUserDTO.getAuthorities() != null) {
-            Set<Authority> authorities = new HashSet<>();
-            managedUserDTO.getAuthorities().stream().forEach(
-                authority -> authorities.add(authorityRepository.findOne(authority))
-            );
-            user.setAuthorities(authorities);
-        }
-        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
-        user.setPassword(encryptedPassword);
-        user.setResetKey(RandomUtil.generateResetKey());
-        user.setResetDate(ZonedDateTime.now());
-        user.setActivated(true);
-        userRepository.save(user);
-        log.debug("Created Information for User: {}", user);
-        return user;
-    }
+	public User createUser(ManagedUserDTO managedUserDTO) {
+		User user = new User();
+		user.setLogin(managedUserDTO.getLogin());
+		user.setFirstName(managedUserDTO.getFirstName());
+		user.setLastName(managedUserDTO.getLastName());
+		user.setEmail(managedUserDTO.getEmail());
+		if (managedUserDTO.getLangKey() == null) {
+			user.setLangKey("en"); // default language is English
+		} else {
+			user.setLangKey(managedUserDTO.getLangKey());
+		}
+		if (managedUserDTO.getAuthorities() != null) {
+			Set<Authority> authorities = new HashSet<>();
+			managedUserDTO.getAuthorities().stream()
+					.forEach(authority -> authorities.add(authorityRepository.findOne(authority)));
+			user.setAuthorities(authorities);
+		}
+		String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+		user.setPassword(encryptedPassword);
+		user.setResetKey(RandomUtil.generateResetKey());
+		user.setResetDate(ZonedDateTime.now());
+		user.setActivated(true);
+		userRepository.save(user);
+		log.debug("Created Information for User: {}", user);
+		return user;
+	}
 
-    public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
-        userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
-            u.setFirstName(firstName);
-            u.setLastName(lastName);
-            u.setEmail(email);
-            u.setLangKey(langKey);
-            userRepository.save(u);
-            log.debug("Changed Information for User: {}", u);
-        });
-    }
+	public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
+		userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+			u.setFirstName(firstName);
+			u.setLastName(lastName);
+			u.setEmail(email);
+			u.setLangKey(langKey);
+			userRepository.save(u);
+			log.debug("Changed Information for User: {}", u);
+		});
+	}
 
-    public void deleteUserInformation(String login) {
-        userRepository.findOneByLogin(login).ifPresent(u -> {
-            userRepository.delete(u);
-            log.debug("Deleted User: {}", u);
-        });
-    }
+	public void deleteUserInformation(String login) {
+		userRepository.findOneByLogin(login).ifPresent(u -> {
+			userRepository.delete(u);
+			log.debug("Deleted User: {}", u);
+		});
+	}
 
-    public void changePassword(String password) {
-        userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
-            String encryptedPassword = passwordEncoder.encode(password);
-            u.setPassword(encryptedPassword);
-            userRepository.save(u);
-            log.debug("Changed password for User: {}", u);
-        });
-    }
+	public void changePassword(String password) {
+		userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+			String encryptedPassword = passwordEncoder.encode(password);
+			u.setPassword(encryptedPassword);
+			userRepository.save(u);
+			log.debug("Changed password for User: {}", u);
+		});
+	}
 
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneByLogin(login).map(u -> {
-            u.getAuthorities().size();
-            return u;
-        });
-    }
+	public Optional<User> getUserWithAuthoritiesByLogin(String login) {
+		return userRepository.findOneByLogin(login).map(u -> {
+			u.getAuthorities().size();
+			return u;
+		});
+	}
 
-    public User getUserWithAuthorities(String id) {
-        User user = userRepository.findOne(id);
-        user.getAuthorities().size(); // eagerly load the association
-        return user;
-    }
+	public User getUserWithAuthorities(String id) {
+		User user = userRepository.findOne(id);
+		user.getAuthorities().size(); // eagerly load the association
+		return user;
+	}
 
-    public User getUserWithAuthorities() {
-        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
-        user.getAuthorities().size(); // eagerly load the association
-        return user;
-    }
+	public User getUserWithAuthorities() {
+		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
+		user.getAuthorities().size(); // eagerly load the association
+		return user;
+	}
 
-    /**
-     * Not activated users should be automatically deleted after 3 days.
-     * <p/>
-     * <p>
-     * This is scheduled to get fired everyday, at 01:00 (am).
-     * </p>
-     */
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void removeNotActivatedUsers() {
-        ZonedDateTime now = ZonedDateTime.now();
-        List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
-        for (User user : users) {
-            log.debug("Deleting not activated user {}", user.getLogin());
-            userRepository.delete(user);
-        }
-    }
+	/**
+	 * Not activated users should be automatically deleted after 3 days.
+	 * <p/>
+	 * <p>
+	 * This is scheduled to get fired everyday, at 01:00 (am).
+	 * </p>
+	 */
+	@Scheduled(cron = "0 0 1 * * ?")
+	public void removeNotActivatedUsers() {
+		ZonedDateTime now = ZonedDateTime.now();
+		List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
+		for (User user : users) {
+			log.debug("Deleting not activated user {}", user.getLogin());
+			userRepository.delete(user);
+		}
+	}
+
+	public List<User> findByIdentifiers(List<UserIdentifier> identifiers) {
+
+		List<String> usernames = new ArrayList<String>();
+
+		if (YaUtil.isNotEmpty(identifiers)) {
+			for (UserIdentifier id : identifiers) {
+				usernames.add(id.getUsername());
+			}
+		}
+
+		return find(usernames);
+	}
+
+	public List<User> find(List<String> usernames) {
+		List<User> result = null;
+
+		log.debug("MongoUserService.find(List<String> usernames) usernames=" + usernames);
+
+		if (YaUtil.isNotEmpty(usernames)) {
+			result = userRepository.findByUsernameIn(usernames);
+		}
+
+		if (result == null) {
+			result = new ArrayList<User>();
+		}
+
+		return result;
+	}
+
+	public User findOne(String username) {
+		log.debug("MongoUserService.load(String userName) username=" + username);
+		User result = null;
+
+		List<User> users = userRepository.findByUsername(username);
+		if (users != null && users.size() > 0) {
+			result = users.get(0);
+		}
+
+		return result;
+	}
+
+	public List<User> findAll() {
+		return userRepository.findAll();
+	}
+
+	public void delete(String id) {
+		userRepository.delete(id);
+	}
+
 }
