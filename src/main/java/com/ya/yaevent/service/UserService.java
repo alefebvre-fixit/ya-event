@@ -225,12 +225,9 @@ public class UserService {
 
 	public User findOne(String username) {
 		log.debug("MongoUserService.load(String userName) username=" + username);
-		User result = null;
+		final User result;
 
-		List<User> users = userRepository.findByUsername(username);
-		if (users != null && users.size() > 0) {
-			result = users.get(0);
-		}
+		result = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
 
 		return result;
 	}

@@ -1,0 +1,23 @@
+<mongoChangeLog>
+	<changeSet changeId="ChangeSet-2" author="jhipster">
+		<script>
+			db.groups.ensureIndex({"id" : 1});
+			db.groups.insert(
+			{
+			"id":"56d06715a826f1b7c4fbac9f",
+			"creationDate":null,
+			"modificationDate":"2016-02-26T14:54:13.428Z",
+			"version":null,"status":null,
+			"eventSize":null,
+			"type":null,"name":"Test",
+			"description":"Test",
+			"location":"Here",
+			"username":null
+			,"user":null,
+			"sponsors":[],
+			"city":null,
+			"country":null
+			}
+		</script>
+	</changeSet>
+</mongoChangeLog>

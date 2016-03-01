@@ -49,6 +49,8 @@ public class GroupResource extends YaResource {
 							HeaderUtil.createFailureAlert("group", "idexists", "A new group cannot already have an ID"))
 					.body(null);
 		}
+
+		group.setUser(getUser().getIdentifier());
 		Group result = getGroupService().save(group);
 		return ResponseEntity.created(new URI("/api/groups/" + result.getId()))
 				.headers(HeaderUtil.createEntityCreationAlert("group", result.getId().toString())).body(result);
@@ -64,6 +66,7 @@ public class GroupResource extends YaResource {
 		if (group.getId() == null) {
 			return createGroup(group);
 		}
+		
 		Group result = getGroupService().save(group);
 		return ResponseEntity.ok().headers(HeaderUtil.createEntityUpdateAlert("group", group.getId().toString()))
 				.body(result);

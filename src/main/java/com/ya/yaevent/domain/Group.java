@@ -20,7 +20,14 @@ import com.ya.yaevent.util.YaUtil;
 
 @Document(collection = "group")
 public class Group implements Serializable {
+	
+	public static final String STATUS_NEW = "New";
+	public static final String STATUS_PUBLISHED = "Published";
+	public static final String STATUS_DRAFT = "Draft";
 
+	
+	public static final String TYPE_COFEE = "Coffee";
+	
 	@Id
 	private String id;
 
@@ -31,16 +38,16 @@ public class Group implements Serializable {
 	private ZonedDateTime modificationDate;
 
 	@Field("version")
-	private Double version;
+	private Double version = 0.;
 
 	@Field("status")
-	private String status;
+	private String status = STATUS_NEW;
 
 	@Field("event_size")
-	private Integer eventSize;
+	private Integer eventSize = 0;
 
 	@Field("type")
-	private String type;
+	private String type = TYPE_COFEE;
 
 	@Field("name")
 	private String name;
