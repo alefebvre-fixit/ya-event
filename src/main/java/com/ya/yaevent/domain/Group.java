@@ -79,6 +79,7 @@ public class Group implements Serializable {
 
 	public void setUser(UserIdentifier user) {
 		this.user = user;
+		this.username = user.getUsername();
 	}
 
 	public String getId() {

@@ -33,9 +33,9 @@ angular.module('yaeventApp')
                     }
                 },
                 resolve: {
-                    entity: ['$stateParams', 'Group', function($stateParams, Group) {
-                        return Group.get({id : $stateParams.id});
-                    }]
+                    groupId: function ($stateParams) {
+                        return $stateParams.id;
+                    }
                 }
             })
             .state('group.new', {

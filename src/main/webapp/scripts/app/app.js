@@ -89,3 +89,16 @@ angular.module('yaeventApp', ['LocalStorageModule',
             pattern: /bool|true|0|1/
         });
     }]);
+
+
+
+
+
+//angular.module('yaeventApp').constant('YaConfig', {context : 'production', url : 'https://calm-headland-3125.herokuapp.com/api', enablePlugin : true, enableDebug : false});
+angular.module('yaeventApp').constant('YaConfig', {context : 'test', url : 'http://localhost:8080/api', enablePlugin : false, enableDebug : true, access_token: 'CAAVKQaHMWpIBAAaNWd5bybmU7raLvONarxkwZCfdItbj6PukTEW1zpXqdh2kvb8pPQCF97lhviWlJ3far0urd8mZBquV7yZCZCbLuy65GMZAteCRzDlZCkIc3x6Ef2HNclPnze5p1l7g29uBZBbZBXLZAzXZA1ii4PtZB2EGbtUwfqxCecuMY9kkixP6pdvH7F1pqQZD'});
+//angular.module('ya-app').constant('YaConfig', {context : 'test', url : 'http://localhost:9000/api', enablePlugin : false, enableDebug : true, access_token: 'CAAVKQaHMWpIBAAaNWd5bybmU7raLvONarxkwZCfdItbj6PukTEW1zpXqdh2kvb8pPQCF97lhviWlJ3far0urd8mZBquV7yZCZCbLuy65GMZAteCRzDlZCkIc3x6Ef2HNclPnze5p1l7g29uBZBbZBXLZAzXZA1ii4PtZB2EGbtUwfqxCecuMY9kkixP6pdvH7F1pqQZD'});
+//angular.module('ya-app').constant('YaConfig', {context : 'production', url : 'http://vast-gorge-2883.herokuapp.com/api', enablePlugin : true, enableDebug : false});
+//angular.module('ya-app').constant('YaConfig', {context : 'simulator', url : 'http://10.0.2.2:9000/api', enablePlugin : true, enableDebug : false});
+
+
+
