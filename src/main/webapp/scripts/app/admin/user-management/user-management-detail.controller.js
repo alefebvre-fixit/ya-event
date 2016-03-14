@@ -3,8 +3,8 @@
 angular.module('yaeventApp')
     .controller('UserManagementDetailController', function ($scope, $stateParams, User) {
         $scope.user = {};
-        $scope.load = function (login) {
-            User.get({login: login}, function(result) {
+        $scope.load = function (username) {
+            User.get({login: username}, function(result) {
                 $scope.user = result;
             });
         };

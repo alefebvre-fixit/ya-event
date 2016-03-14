@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 
 import com.ya.yaevent.domain.Authority;
 import com.ya.yaevent.domain.User;
+import com.ya.yaevent.domain.user.Following;
 import com.ya.yaevent.domain.user.UserIdentifier;
 import com.ya.yaevent.repository.AuthorityRepository;
+import com.ya.yaevent.repository.FollowingRepository;
 import com.ya.yaevent.repository.UserRepository;
 import com.ya.yaevent.security.SecurityUtils;
 import com.ya.yaevent.service.util.RandomUtil;
@@ -41,6 +43,9 @@ public class UserService {
 
 	@Inject
 	private AuthorityRepository authorityRepository;
+
+	@Inject
+	private FollowingRepository followingRepository;
 
 	public Optional<User> activateRegistration(String key) {
 		log.debug("Activating user for activation key {}", key);
@@ -79,14 +84,14 @@ public class UserService {
 		});
 	}
 
-	public User createUserInformation(String login, String password, String firstName, String lastName, String email,
+	public User createUserInformation(String username, String password, String firstName, String lastName, String email,
 			String langKey) {
 
 		User newUser = new User();
 		Authority authority = authorityRepository.findOne("ROLE_USER");
 		Set<Authority> authorities = new HashSet<>();
 		String encryptedPassword = passwordEncoder.encode(password);
-		newUser.setLogin(login);
+		newUser.setUsername(username);
 		// new user gets initially a generated password
 		newUser.setPassword(encryptedPassword);
 		newUser.setFirstName(firstName);
@@ -106,7 +111,7 @@ public class UserService {
 
 	public User createUser(ManagedUserDTO managedUserDTO) {
 		User user = new User();
-		user.setLogin(managedUserDTO.getLogin());
+		user.setUsername(managedUserDTO.getUsername());
 		user.setFirstName(managedUserDTO.getFirstName());
 		user.setLastName(managedUserDTO.getLastName());
 		user.setEmail(managedUserDTO.getEmail());
@@ -131,26 +136,31 @@ public class UserService {
 		return user;
 	}
 
-	public void updateUserInformation(String firstName, String lastName, String email, String langKey) {
-		userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+	public void updateUserInformation(String firstName, String lastName, String email, String city, String country,
+			String website, String biography, String langKey) {
+		userRepository.findOneByUsername(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
 			u.setFirstName(firstName);
 			u.setLastName(lastName);
 			u.setEmail(email);
+			u.setCity(city);
+			u.setCountry(country);
+			u.setWebsite(website);
+			u.setBiography(biography);
 			u.setLangKey(langKey);
 			userRepository.save(u);
 			log.debug("Changed Information for User: {}", u);
 		});
 	}
 
-	public void deleteUserInformation(String login) {
-		userRepository.findOneByLogin(login).ifPresent(u -> {
+	public void deleteUserInformation(String username) {
+		userRepository.findOneByUsername(username).ifPresent(u -> {
 			userRepository.delete(u);
 			log.debug("Deleted User: {}", u);
 		});
 	}
 
 	public void changePassword(String password) {
-		userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+		userRepository.findOneByUsername(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
 			String encryptedPassword = passwordEncoder.encode(password);
 			u.setPassword(encryptedPassword);
 			userRepository.save(u);
@@ -158,8 +168,8 @@ public class UserService {
 		});
 	}
 
-	public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-		return userRepository.findOneByLogin(login).map(u -> {
+	public Optional<User> getUserWithAuthoritiesByUsername(String username) {
+		return userRepository.findOneByUsername(username).map(u -> {
 			u.getAuthorities().size();
 			return u;
 		});
@@ -172,7 +182,7 @@ public class UserService {
 	}
 
 	public User getUserWithAuthorities() {
-		User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
+		User user = userRepository.findOneByUsername(SecurityUtils.getCurrentUser().getUsername()).get();
 		user.getAuthorities().size(); // eagerly load the association
 		return user;
 	}
@@ -189,7 +199,7 @@ public class UserService {
 		ZonedDateTime now = ZonedDateTime.now();
 		List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
 		for (User user : users) {
-			log.debug("Deleting not activated user {}", user.getLogin());
+			log.debug("Deleting not activated user {}", user.getUsername());
 			userRepository.delete(user);
 		}
 	}
@@ -227,7 +237,7 @@ public class UserService {
 		log.debug("MongoUserService.load(String userName) username=" + username);
 		final User result;
 
-		result = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
+		result = userRepository.findOneByUsername(SecurityUtils.getCurrentUser().getUsername()).get();
 
 		return result;
 	}
@@ -238,6 +248,105 @@ public class UserService {
 
 	public void delete(String id) {
 		userRepository.delete(id);
+	}
+
+	public int countFollowers(String username) {
+		log.debug("MongoUserService.countFollowers(String username) username=" + username);
+		return followingRepository.countByFollowee(username);
+	}
+
+	public void follow(String follower, String followee) {
+		log.debug("MongoUserService.follow(String follower, String followee) follower=" + follower + " follower= "
+				+ follower);
+
+		List<Following> following = followingRepository.findByFolloweeAndFollower(followee, follower);
+		if (YaUtil.isEmpty(following)) {
+			followingRepository.save(Following.create(followee, follower));
+		}
+	}
+
+	public void unFollow(String follower, String followee) {
+		log.debug("MongoUserService.unFollow(String follower, String followee) follower=" + follower + " follower= "
+				+ follower);
+		List<Following> following = followingRepository.findByFolloweeAndFollower(followee, follower);
+		if (YaUtil.isNotEmpty(following)) {
+			followingRepository.delete(following);
+		}
+
+	}
+
+	public List<User> getFollowers(String username) {
+
+		log.debug("MongoUserService.getFollowers(String username) username=" + username);
+
+		List<User> result = null;
+
+		List<String> names = findFollowerNames(username);
+
+		if (YaUtil.isNotEmpty(names)) {
+			result = userRepository.findByUsernameIn(names);
+		}
+
+		if (result == null) {
+			result = new ArrayList<User>();
+		}
+
+		log.debug("MongoUserService.getFollowers(String username) result=" + result.size());
+
+		return result;
+	}
+
+	public List<String> findFollowerNames(String username) {
+		log.debug("MongoUserService.getFollowerNames(String username) username=" + username);
+
+		List<String> result = new ArrayList<String>();
+
+		List<Following> following = followingRepository.findByFollowee(username);
+		if (YaUtil.isNotEmpty(following)) {
+			for (Following f : following) {
+				result.add(f.getFollower());
+			}
+		}
+
+		return result;
+	}
+
+	public List<String> findFollowingNames(String username) {
+		log.debug("MongoUserService.getFollowingNames(String username) username=" + username);
+
+		List<String> result = new ArrayList<String>();
+
+		List<Following> following = followingRepository.findByFollower(username);
+		if (following != null && following.size() > 0) {
+			for (Following f : following) {
+				result.add(f.getFollowee());
+			}
+		}
+
+		return result;
+	}
+
+	public List<User> findFollowing(String username) {
+		List<User> result = null;
+
+		log.debug("MongoUserService.getFollowing(String username) username=" + username);
+
+		List<String> names = findFollowingNames(username);
+
+		if (YaUtil.isNotEmpty(names)) {
+			result = userRepository.findByUsernameIn(names);
+		}
+
+		if (result == null) {
+			result = new ArrayList<User>();
+		}
+
+		return result;
+	}
+
+	public int countFollowing(String username) {
+		log.debug("MongoUserService.countFollowing(String username) username=" + username);
+		return followingRepository.countByFollower(username);
 	}
 
 }

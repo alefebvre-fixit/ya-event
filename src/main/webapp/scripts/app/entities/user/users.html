@@ -1,0 +1,36 @@
+
+<div>
+
+
+
+		<div class="comment-wrapper">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    Users
+                </div>
+                <div class="panel-body">
+                    <ul class="media-list">
+                        <li class="media" ng-repeat="user in users">
+                            <a ui-sref="user-profile({username: user.username})" class="pull-left">
+                                <img src="http://bootdey.com/img/Content/user_1.jpg" alt="" class="img-circle" height="40" width="40">
+                            </a>
+                            <div class="media-body">
+                                <strong class="text-success">@{{user.username}}</strong>
+                                <p>
+                                    <i class="icon ion-location"> {{user.city}}, {{user.country}}</i>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+    <button type="submit"
+            onclick="window.history.back()"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+</div>

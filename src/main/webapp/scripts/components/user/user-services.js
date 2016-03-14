@@ -86,12 +86,18 @@ angular.module('yaeventApp').factory('UserService', ['$http', '$log', 'YaConfig'
         },
         getUserDiscovery: function () {
             return $http.get(YaConfig.url + '/users/discovery').then(function (response) {
-                User.inject(response.data);
+                //User.inject(response.data);
                 return response.data;
             });
         },
         getUsers: function () {
-            return User.findAll();
+        	$log.log('call getUsers');
+            return $http.get(YaConfig.url + '/users').then(function (response) {
+            	$log.log('call getUsers - response');
+            	$log.log(response.data);
+                return response.data;
+            });
+            //return User.findAll();
         },
         canEdit: function(user){
             //$log.debug("call canUpdate from UserService canUpdate =" + YaService.getUsername());

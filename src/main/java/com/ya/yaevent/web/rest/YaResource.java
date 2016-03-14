@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ya.yaevent.domain.User;
+import com.ya.yaevent.security.SecurityUtils;
 import com.ya.yaevent.service.EventService;
 import com.ya.yaevent.service.GroupService;
 import com.ya.yaevent.service.NotificationService;
@@ -57,8 +58,11 @@ public class YaResource {
 	}
 
 	protected static String getUserName() {
-		UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return user.getUsername();
+		return SecurityUtils.getCurrentUsername();
+		
+		
+		//UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		//return user.getUsername();
 	}
 
 }

@@ -27,11 +27,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Id
 	private String id;
 
-	@NotNull
-	@Pattern(regexp = "^[a-z0-9]*$|(anonymousUser)")
-	@Size(min = 1, max = 50)
-	private String login;
-
 	@JsonIgnore
 	@NotNull
 	@Size(min = 60, max = 60)
@@ -45,14 +40,32 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@Field("last_name")
 	private String lastName;
 	
-	@Size(max = 50)
+	@NotNull
+	@Pattern(regexp = "^[a-z0-9]*$|(anonymousUser)")
+	@Size(min = 1, max = 50)
 	@Field("username")
 	private String username;
 
 	@Email
 	@Size(max = 100)
 	private String email;
-
+	
+	@Size(max = 50)
+	@Field("city")
+	private String city;
+	
+	@Size(max = 50)
+	@Field("country")
+	private String country;
+	
+	@Size(max = 50)
+	@Field("website")
+	private String website;
+	
+	@Size(max = 50)
+	@Field("biography")
+	private String biography;
+	
 	private boolean activated = false;
 
 	@Size(min = 2, max = 5)
@@ -74,6 +87,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	@JsonIgnore
 	private Set<Authority> authorities = new HashSet<>();
 	
+	@Field("facebook_id")
+	private String facebookId;
+	
+	@Field("gravatar_id")
+	private String gravatarId;
+	
+	
 	private Profile profile = new Profile();
 
 	public Profile getProfile() {
@@ -92,12 +112,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.id = id;
 	}
 
-	public String getLogin() {
-		return login;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setLogin(String login) {
-		this.login = login;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
@@ -180,8 +200,37 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.authorities = authorities;
 	}
 
-	private String facebookId;
-	private String gravatarId;
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getWebsite() {
+		return website;
+	}
+
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+
+	public String getBiography() {
+		return biography;
+	}
+
+	public void setBiography(String biography) {
+		this.biography = biography;
+	}
 
 	public String getFacebookId() {
 		return facebookId;
@@ -204,7 +253,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 		result.setFacebookId(facebookId);
 		result.setGravatarId(gravatarId);
-		result.setUsername(login);
+		result.setUsername(username);
 
 		return result;
 	}
@@ -220,29 +269,24 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
 		User user = (User) o;
 
-		if (!login.equals(user.login)) {
+		if (!username.equals(user.username)) {
 			return false;
 		}
 
 		return true;
 	}
+	
+	
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
 
 	@Override
 	public int hashCode() {
-		return login.hashCode();
+		return username.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return "User{" + "login='" + login + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
+		return "User{" + "username='" + username + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName
 				+ '\'' + ", email='" + email + '\'' + ", activated='" + activated + '\'' + ", langKey='" + langKey
 				+ '\'' + ", activationKey='" + activationKey + '\'' + "}";
 	}

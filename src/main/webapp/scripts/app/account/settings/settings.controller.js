@@ -31,7 +31,11 @@ angular.module('yaeventApp')
                 firstName: account.firstName,
                 langKey: account.langKey,
                 lastName: account.lastName,
-                login: account.login
+                username: account.username,
+                city: account.city,
+                country: account.country,
+            	webstite: account.website,
+            	biography: account.biography
             }
         }
     });
