@@ -1,13 +1,5 @@
 
 /* entire container, keeps perspective */
-.card-container {
-	  -webkit-perspective: 800px;
-   -moz-perspective: 800px;
-     -o-perspective: 800px;
-        perspective: 800px;
-        margin-bottom: 30px;
-}
-
 
 
 
@@ -18,11 +10,7 @@
     color: #444444;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.card-container, .front, .back {
-	width: 100%;
-	height: 420px;
-	border-radius: 4px;
-}
+
 .card .cover{
     height: 105px;
     overflow: hidden;
@@ -76,15 +64,27 @@
     margin: 30px 0 0;
     padding: 10px 0 0;
     text-align: center;
+    
 }
 .card .footer .btn-simple{
     margin-top: -6px;
 }
-.card .header {
-    padding: 15px 20px;
-    height: 90px;
+
+.statistic{
+  margin: 0;
+  font-size: 22px;
+  
+  color: #FF3D7F;
+  text-align: center;
+  text-decoration: none !important;
 }
 
 
 
+.statistic-label{
+  margin: 0;
+  text-align: center;
+  text-decoration: none !important;
+  color: #999999;
+}
 
